@@ -8,13 +8,17 @@ import {
   signOut,
 } from "firebase/auth";
 import Dashboard from './components/Dashboard';
+import {Routes, Route, Navigate } from "react-router-dom";
 
 
 function App() {
   return (
     <>
-    <Signup />
-    <Dashboard />
+    <Routes>
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/" element={<Signin />} />
+                <Route path="/home" element={<Dashboard />} />
+    </Routes>
     </>
   );
 }

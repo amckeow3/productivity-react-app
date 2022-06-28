@@ -1,4 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, Component } from "react";
+import {
+  Route,
+  NavLink,
+  HashRouter
+} from "react-router-dom";
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -8,6 +13,7 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import { getAuth, createUserWithEmailAndPassword, Auth } from "firebase/auth";
 import { auth } from "../firebase.config";
+import Signin from "./Signin";
 
 
 function Signup() {
@@ -95,7 +101,7 @@ function Signup() {
                 sx={{ mt: 3, mb: 2 }}>Submit</Button>
                 <Grid container>
                     <Grid item>
-                        <Link href="#" variant="body2">
+                        <Link href="/signin" variant="body2">
                             {"Already have an account? Sign In"}
                         </Link>
                     </Grid>
