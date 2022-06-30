@@ -1,116 +1,229 @@
-import React, { useState, useRef, Component } from "react";
+import { Container, Grid, Box, Typography, Stack } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import { FC, useState, useEffect } from 'react';
+import { useForm, SubmitHandler, FormProvider } from 'react-hook-form';
+import { object, string, TypeOf } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import FormInput from './FormInput';
+import { ReactComponent as GoogleLogo } from '../assets/google.svg';
+import { ReactComponent as GitHubLogo } from '../assets/github.svg';
+import { LinkItem, OauthMuiLink } from './Login';
 import {
-  Route,
-  NavLink,
-  HashRouter
-} from "react-router-dom";
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import { getAuth, createUserWithEmailAndPassword, Auth } from "firebase/auth";
-import { auth } from "../firebase.config";
-import Signin from "./Signin";
+  createUserWithEmailAndPassword
+} from "firebase/auth";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  auth,
+  registerWithEmailAndPassword
+} from "../firebase.config";
+
+//  SignUp Schema with Zod
+const signupSchema = object({
+    name: string().min(1, 'Name is required').max(70),
+    email: string().min(1, 'Email is required').email('Email is invalid')
+      .min(8, 'Password must be more than 8 characters'),
+    password: string()
+      .min(1, 'Password is required')
+      .min(8, 'Password must be more than 8 characters')
+      .max(32, 'Password must be less than 32 characters'),
+  });
+  
+  type ISignUp = TypeOf<typeof signupSchema>;
 
 
-function Signup() {
-    const [registerEmail, setRegisterEmail] = useState("");
-    const [registerPassword, setRegisterPassword] = useState("");
-    const [user, setUser] = useState({});
-
-    const register = () => {
-        try {
-          const user = createUserWithEmailAndPassword(
-            auth,
-            registerEmail,
-            registerPassword
-          );
-          console.log(user)
-        } catch (error) {
-          console.log(error);
-        }
+const Signup = () => {
+    const defaultValues: ISignUp = {
+        name: '',
+        email: '',
+        password: '',
       };
 
-    const signup = () => {
-        const auth = getAuth();
-        createUserWithEmailAndPassword(auth, registerEmail, registerPassword)
-        .then((userCredential) => {
-          // Signed in 
-          const user = userCredential.user;
-          console.log("User was successfully created!");
-          console.log(user);
-        })
-       .catch((error: { code: any; message: any; }) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          // ..
-          console.log(errorCode);
-          console.log(errorMessage);
-        });
-    }
+      const [signupEmail, setSignupEmail] = useState("");
+      const [signupPassword, setSignupPassword] = useState("");
+      const [name, setName] = useState("");
+      const [user, loading, error] = useAuthState(auth);
 
-    const handleSubmit = (event: { preventDefault: () => void; }) => {
-      event.preventDefault();
-      signup(); 
-    }
+      const navigate = useNavigate();
 
+      const register = () => {
+        if (!name) {
+          alert("Please enter name"); 
+        }
+        else if (signupEmail.length == 0) {
+          alert("'Email is required'")
+        } else if (signupPassword.length == 0) {
+          alert("Password is required");
+        } else if (signupPassword.length < 8 && signupPassword.length > 0) {
+          alert("Password must be more than 8 characters");
+        }
+        else {
+          registerWithEmailAndPassword(name, signupEmail, signupPassword)
+        }
+      };
+      useEffect(() => {
+        if (loading) return;
+        if (user) navigate("/dashboard");
+      }, [user, loading]);
     
-    return (
-        <>
-        <Container component="main" maxWidth="xs">
-            <Box
-                sx={{
-                marginTop: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                }}
+      //  Object containing all the methods returned by useForm
+      const methods = useForm<ISignUp>({
+        resolver: zodResolver(signupSchema),
+        defaultValues,
+      });
+    
+      //  Form Handler
+      const onSubmitHandler: SubmitHandler<ISignUp> = (values: ISignUp) => {
+        console.log(values);
+      };
+    
+      //  Returned JSX
+      return (
+        <Container
+          maxWidth={false}
+          sx={{ height: '100vh', backgroundColor: { xs: '#fff', md: '#f4f4f4' } }}
+        >
+          <Grid
+            container
+            justifyContent='center'
+            alignItems='center'
+            sx={{ width: '100%', height: '100%' }}
+          >
+            <Grid
+              item
+              sx={{ maxWidth: '70rem', width: '100%', backgroundColor: '#fff' }}
             >
-            <Typography component="h1" variant="h5">
-                Sign Up
-            </Typography>
-            <Box component="form" sx={{ mt: 1 }}>
-                <TextField
-                      margin="normal"
-                      required
-                      fullWidth
-                      id="registerEmail"
-                      name="registerEmail"
-                      type="text"
-                      placeholder="Email"
-                >
-                </TextField>
-                <TextField
-                    margin="normal"
-                    required
-                    fullWidth
-                    id="registerPassword"
-                    name="registerPassword"
-                    type="password"
-                    placeholder="Password"
-                >
-                </TextField>
-                <Button
-                type="submit"
-                fullWidth
-                onChange={handleSubmit}
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}>Submit</Button>
-                <Grid container>
-                    <Grid item>
-                        <Link href="/signin" variant="body2">
-                            {"Already have an account? Sign In"}
-                        </Link>
+              <Grid
+                container
+                sx={{
+                  boxShadow: { sm: '0 0 5px #ddd' },
+                  py: '6rem',
+                  px: '1rem',
+                }}
+              >
+                <FormProvider {...methods}>
+                  <Grid
+                    item
+                    container
+                    justifyContent='space-between'
+                    rowSpacing={5}
+                    sx={{
+                      maxWidth: { sm: '45rem' },
+                      marginInline: 'auto',
+                    }}
+                  >
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      sx={{ borderRight: { sm: '1px solid #ddd' } }}
+                    >
+                      <Box
+                        display='flex'
+                        flexDirection='column'
+                        component='form'
+                        noValidate
+                        autoComplete='off'
+                        sx={{ paddingRight: { sm: '3rem' } }}
+                        onSubmit={methods.handleSubmit(onSubmitHandler)}
+                      >
+                        <Typography
+                          variant='h6'
+                          component='h1'
+                          sx={{ textAlign: 'center', mb: '1.5rem' }}
+                        >
+                          Create new your account
+                        </Typography>
+    
+                        <FormInput
+                          label='Name'
+                          type='text'
+                          name='name'
+                          id='anme'
+                          focused
+                          required
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                        />
+                        <FormInput
+                          label='Enter your email'
+                          type='email'
+                          name='email'
+                          id='email'
+                          focused
+                          required
+                          value={signupEmail}
+                          onChange={(e) => setSignupEmail(e.target.value)}
+                        />
+                        <FormInput
+                          type='password'
+                          label='Password'
+                          name='password'
+                          id='password'
+                          required
+                          focused
+                          value={signupPassword}
+                          onChange={(e) => setSignupPassword(e.target.value)}
+                        />
+    
+                        <LoadingButton
+                          loading={false}
+                          type='submit'
+                          variant='contained'
+                          onClick={register}
+                          sx={{
+                            py: '0.8rem',
+                            mt: 2,
+                            width: '80%',
+                            marginInline: 'auto',
+                          }}
+                        >
+                          Sign Up
+                        </LoadingButton>
+                      </Box>
                     </Grid>
-                </Grid>
-            </Box>
-        </Box>
-    </Container>
-    </>
-    );
+                    <Grid item xs={12} sm={6} sx={{}}>
+                      <Typography
+                        variant='h6'
+                        component='p'
+                        sx={{
+                          paddingLeft: { sm: '3rem' },
+                          mb: '1.5rem',
+                          textAlign: 'center',
+                        }}
+                      >
+                        Sign up using another provider:
+                      </Typography>
+                      <Box
+                        display='flex'
+                        flexDirection='column'
+                        sx={{ paddingLeft: { sm: '3rem' }, rowGap: '1rem' }}
+                      >
+                        <OauthMuiLink href=''>
+                          <GoogleLogo style={{ height: '2rem' }} />
+                          Google
+                        </OauthMuiLink>
+                        <OauthMuiLink href=''>
+                          <GitHubLogo style={{ height: '2rem' }} />
+                          GitHub
+                        </OauthMuiLink>
+                      </Box>
+                    </Grid>
+                  </Grid>
+                  <Grid container justifyContent='center'>
+                    <Stack sx={{ mt: '3rem', textAlign: 'center' }}>
+                      <Typography sx={{ fontSize: '0.9rem', mb: '1rem' }}>
+                        Already have an account? <LinkItem to='/'>Login</LinkItem>
+                      </Typography>
+                    </Stack>
+                  </Grid>
+                </FormProvider>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Container>
+      );
+
 }
 
 export default Signup;

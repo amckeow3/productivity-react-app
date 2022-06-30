@@ -1,25 +1,28 @@
 import React, { useEffect, useState }from 'react';
-import Signin from './components/Signin';
-import Signup from './components/Signup';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
-import Dashboard from './components/Dashboard';
-import {Routes, Route, Navigate } from "react-router-dom";
 
+import { 
+  BrowserRouter as Router,
+  Routes,
+  Route } from "react-router-dom";
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Dashboard from './components/Dashboard';
 
 function App() {
-  return (
-    <>
+ return (
+  <Router>
     <Routes>
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/" element={<Signin />} />
-                <Route path="/home" element={<Dashboard />} />
+      <Route path="*" element={<Login />} />
+      <Route path="signup" element={<Signup />} />
+      <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
-    </>
+  </Router>
   );
 }
 
