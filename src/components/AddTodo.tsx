@@ -130,7 +130,7 @@ const AddTodo = ({ onClose, open }: { onClose: any; open: boolean }) => {
                         id="todoDate"
                         name="todoDate"
                         placeholder="Todo Date"
-                        type="date"
+                        type="string"
                         required
                         value={ todoDate }
                         onChange={(e) => setNewTodoDate(e.target.value)}
