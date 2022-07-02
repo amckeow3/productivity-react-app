@@ -16,8 +16,7 @@ import Container from '@mui/material/Container';
 import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from "react-router-dom";
 import { 
-    collection,
-    addDoc, 
+    collection, 
     doc,
     query,  
     getDocs, 
@@ -30,8 +29,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db, logout } from "../firebase.config";
 import Todos from './Todos';
 import AddTodo from './AddTodo';
-import { LegendToggleTwoTone } from "@mui/icons-material";
-import { zodResolver } from '@hookform/resolvers/zod';
 import { boolean, object, string, TypeOf } from 'zod';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -39,10 +36,12 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
-import '../global';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import AppBar from "@mui/material/AppBar";
 import Stack from '@mui/material/Stack';
+import TrendsChart from './TrendsChart';
+import Spending from './Spending';
+import CircleIcon from '@mui/icons-material/Circle';
+import TodayIcon from '@mui/icons-material/Today';
 
 const main = '#e040fb';
 
@@ -65,10 +64,8 @@ const Dashboard = () => {
     const [name, setName] = useState("");
     const [openAddModal, setOpenAddModal] = useState(false);
     const [todos, setTodos] = useState<any[]>([]);
-    const [isTodoChecked, setIsTodoChecked] = useState(false);
     const [todoId, setTodoId] = useState("");
     const [completedTaskList, setCompletedTaskList] = useState<any[]>([]);
-    const [todaysDate, setTodaysDate] = useState("");
     const [todaysTodos, setTodaysTodos] = useState<any[]>([]);
     let todoArr: any[] = [];
     let todaysTodosArr: any[] = [];
@@ -126,57 +123,6 @@ const Dashboard = () => {
         }
     }
 
-    const handleToggle = async(e: { target: { value: string; }; } ) => {
-        console.log("Id of selected task: " + todoId);
-        const taskDocRef = doc(db, 'todos', todoId);
-        const id = e?.target.value;
-
-        setTodoId(id);
-        setIsTodoChecked(isTodoChecked!);
-        console.log(`${id} is ${isTodoChecked}`);
-
-        const completedItems = completedTaskList;
-        //const completedTaskDocRef = doc(db, 'todos', id);
-        
-        try{
-          await updateDoc(taskDocRef, {
-            completed: isTodoChecked
-          })
-        } catch (err) {
-          alert(err)
-        }
-      }
-
-      const checkValue = async(e: { target: { value: string; }; }) => {
-        var value = e.target.value;
-        console.log("You selected " + value);
-        const taskDocRef = doc(db, 'todos', value);
-        setIsTodoChecked(!isTodoChecked);
-        try{
-          await updateDoc(taskDocRef, {
-            completed: isTodoChecked
-          }) 
-          
-        } catch (err) {
-          alert(err)
-        }
-       fetchAllTodos();
-      }
-
-      const handleChange = async() => {
-        setIsTodoChecked(!isTodoChecked);
-        console.log(`${todoId} is ${isTodoChecked}`);
-        const todoDocRef = doc(db, 'todos', todoId)
-        try{
-          await updateDoc(todoDocRef, {
-            completed: isTodoChecked
-          })
-        } catch (err) {
-          alert(err)
-        }
-      }
-    
-  //const todos: { id: string; todoName: string; todoDate: string; completed: boolean; }[] = []; 
   /* function to get all tasks from firestore in realtime */ 
   useEffect(() => {
     if (loading) return;
@@ -220,22 +166,29 @@ const Dashboard = () => {
                     </Box>
                 </Container>
             </AppBar>
-            <Container
-                sx={{ 
-                padding: '20px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: "row",
-                }}>
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+              {/* Chart */}
+              
+              {/* Recent Deposits */}
+              <Grid item xs={12} md={4} lg={3}>
+              <Container>
                 <Paper 
-                    sx={{ 
-                    padding: '20px',
-                    display: 'flex', 
-                    flexDirection: 'column' 
+                sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column'
                     }}>
-                    <Typography variant='h5' sx={{color: main}}>Today's Tasks</Typography>
+                        <Container
+                            sx={{ 
+                            display: 'flex',
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            flexDirection: "row"
+                            }}>
+                            <TodayIcon sx={{color: main}}/>
+                            <Typography variant='h5' sx={{color: main}}>Today</Typography>
+                        </Container>
                     <Table>
                             <TableHead>
                                     <TableRow>
@@ -245,32 +198,23 @@ const Dashboard = () => {
                             <TableBody>   
                                 { todaysTodos.map((todo) => (
                                 <TableRow id={todo.id} key={todo.id}>
-                                    {/*<Checkbox 
-                                        id={`checkbox-${todo.id}`} 
-                                        name="todoItems"
-                                        value={todo.id}
-                                        checked={isTodoChecked} 
-                                        onClick={() => setTodoId(todo.id)}
-                                onChange={ handleChange } />*/}
                                     <TableCell>{todo.data.todoName}</TableCell>
                                 </TableRow>
                         ))}
                             </TableBody>
                     </Table>
                 </Paper>
-            </Container>
-            <Box sx={{ display: 'flex' }}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                        <Container>
-                        <Paper 
-                            sx={{ p: 2, 
-                            display: 'flex', 
-                            flexDirection: 'column',
-                            width: '80%'
-                            }}
-                        >
-                        <Container
+                </Container>
+              </Grid>
+              <Grid item xs={12} md={8} lg={9}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                   <Container
                             sx={{ 
                             display: 'flex',
                             justifyContent: "space-between",
@@ -290,20 +234,44 @@ const Dashboard = () => {
                                     </Button>
                                 </Container>
                                 <Container>
-                                        <Todos todosData={todos} />
-                                </Container>
-                            
-                        </Paper>
-    
+                                    <Todos todosData={todos} />
                         </Container>
-                    </Grid>
+                    </Paper>
                 </Grid>
-            </Box>
-            { openAddModal &&
-            <AddTodo onClose={() => setOpenAddModal(false)} open={openAddModal}/>
-            }
+              </Grid>
+          </Container>
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+              {/* Chart */}
+              <Grid item xs={12} md={8} lg={9}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 240,
+                  }}
+                >
+                  <TrendsChart />
+                </Paper>
+              </Grid>
+              {/* Recent Deposits */}
+              <Grid item xs={12} md={4} lg={3}>
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: 240,
+                  }}
+                >
+                  <Spending />
+                </Paper>
+              </Grid>
+              </Grid>
+          </Container>
         </Container>
-        </>
+    </>
     )
 }
 

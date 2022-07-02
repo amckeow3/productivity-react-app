@@ -96,15 +96,12 @@ const AddTodo = ({ onClose, open }: { onClose: any; open: boolean }) => {
         <Dialog 
             open={ open }
             onClose={ onClose }>
-            
                 <DialogTitle>
                     <Stack display="flex" direction="row" spacing={4}>
                         <Typography variant="h4">New Todo</Typography>
                         <CloseIcon sx={closeButton} onClick={ onClose } />
                     </Stack>
                 </DialogTitle>
-        
-            
             <FormProvider {...methods}>
                 <Grid
                     container
@@ -147,12 +144,13 @@ const AddTodo = ({ onClose, open }: { onClose: any; open: boolean }) => {
                             mt: 2,
                             marginBottom: 10,
                             marginInline: 'auto',
+                            backgroundColor: '#e040fb',
                         }}
                     > Add </LoadingButton>
                 </Stack>
                 </Grid>
             </FormProvider>
-    </Dialog>
+        </Dialog>
     </>
     )
 }
