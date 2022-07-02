@@ -1,43 +1,34 @@
-import React, { useState } from 'react';
-import List from '@mui/material/List';
-import Box from '@mui/material/Box';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Checkbox from '@mui/material/Checkbox';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
+import React, { useState, useEffect  } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useAuthState } from "react-firebase-hooks/auth";
 import { 
     doc, 
     updateDoc, 
-    deleteDoc,
-    query,
-    collection,
-    getDocs,
-    where
+    deleteDoc
 } from "firebase/firestore"; 
-import { db, auth } from '../firebase.config';
-import { TryOutlined } from '@mui/icons-material';
+import { db } from '../firebase.config';
 
-const Todos = ({ id, todoName, todoDate, completed }: { id: string, todoName: string, todoDate: string, completed: boolean })  => {
-    const [user, loading, error] = useAuthState(auth);
+interface ITodo {
+    [id: string]: any; 
+    todoName: string;
+    todoDate: number;
+    completed: boolean;
+    uid: string;
+}
+
+const Todos = ({todosData} : {todosData: Array<ITodo>})  => {
     const [isChecked, setChecked] = useState(false);
-    //const [todos, setTodos] = useState([]);
-    const [taskName  , setTaskName] = useState("");
-    const [taskDate , setTaskDate] = useState(""); 
-    const [uid, setUid] = useState("");
     const [todoId, setTodoId] = useState("");
 
+    const setTodos = () => {
+        console.log(todosData);
+    }
+
     const handleChange = async () => {
-        const taskDocRef = doc(db, 'todos', id)
+        const taskDocRef = doc(db, 'todos', todoId)
         try{
           await updateDoc(taskDocRef, {
             completed: isChecked
@@ -57,27 +48,36 @@ const Todos = ({ id, todoName, todoDate, completed }: { id: string, todoName: st
         }
     }
 
-    const handleToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setChecked(event.target.checked);
-        console.log(isChecked);
-    };
-       
+    useEffect(() => {
+       setTodos();
+      }, []);
 
     return (
         <>
-        <Container>
-            <TableCell>
-                <Checkbox 
-                id={`checkbox-${id}`} 
-                name="checkbox" 
-                checked={isChecked}
-                onChange={handleChange} />
-            </TableCell>
-            <TableCell>{todoName}</TableCell>
-            <TableCell>{todoDate.toString()}</TableCell>
-            <TableCell>{completed}</TableCell>                  
-        </Container>
-    </>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Task</TableCell>
+                        <TableCell>Date</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {/*<Checkbox 
+                    id={`checkbox-${todo.id}`} 
+                    name="todoItems"
+                    value={todo.id}
+                    checked={isTodoChecked} 
+                    onClick={() => setTodoId(todo.id)}
+                    onChange={ handleChange } /> Need to go below todosData.map!!*/}   
+                    { todosData.map((todo) => (
+                    <TableRow id={todo.id} key={todo.id}>
+                        <TableCell>{todo.data.todoName}</TableCell>
+                        <TableCell>{todo.data.todoDate}</TableCell>
+                    </TableRow>
+                    ))}
+                </TableBody>
+            </Table>                 
+        </>
     )
 }
 

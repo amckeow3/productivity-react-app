@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo  } from "react";
 import List from '@mui/material/List';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
@@ -286,29 +286,13 @@ const Dashboard = () => {
                                         }} 
                                         onClick={() => setOpenAddModal(true)}
                                     >
-                                     <AddIcon />
+                                        <AddIcon />
                                     </Button>
                                 </Container>
-                            <Table>
-                            <TableHead>
-                                    <TableRow>
-                                        <TableCell>Task</TableCell>
-                                        <TableCell>Date</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                              <TableBody>   
-                                { todos.map((todo) => (
-                                    <TableRow id={todo.id} key={todo.id} sx={{ '&:last-child td, &:last-child th': { border: 0 }} }>
-                                    <Todos
-                                        id={todo.id}
-                                        todoName={todo.data.todoName}
-                                        todoDate={todo.data.todoDate} 
-                                        completed={todo.data.completed}
-                                    />
-                                </TableRow>
-                        ))}
-                            </TableBody>
-                        </Table>
+                                <Container>
+                                        <Todos todosData={todos} />
+                                </Container>
+                            
                         </Paper>
     
                         </Container>
