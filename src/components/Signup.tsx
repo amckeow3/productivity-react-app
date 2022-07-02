@@ -176,6 +176,7 @@ const Signup = () => {
                             mt: 2,
                             width: '80%',
                             marginInline: 'auto',
+                            backgroundColor: '#e040fb',
                           }}
                         >
                           Sign Up

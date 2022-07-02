@@ -66,19 +66,16 @@ const Todos = ({ id, todoName, todoDate, completed }: { id: string, todoName: st
     return (
         <>
         <Container>
-            <Checkbox 
+            <TableCell>
+                <Checkbox 
                 id={`checkbox-${id}`} 
                 name="checkbox" 
                 checked={isChecked}
                 onChange={handleChange} />
-            <label 
-                htmlFor={`checkbox-${id}`} 
-                onClick={() => setChecked(!isChecked)} >
-            </label>
-                                <TableCell>{todoName}</TableCell>
-                                <TableCell>{todoDate.toString()}</TableCell>
-                                <TableCell>{completed}</TableCell>
-                            
+            </TableCell>
+            <TableCell>{todoName}</TableCell>
+            <TableCell>{todoDate.toString()}</TableCell>
+            <TableCell>{completed}</TableCell>                  
         </Container>
     </>
     )

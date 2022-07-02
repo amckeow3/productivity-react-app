@@ -1,11 +1,4 @@
-import React, { useEffect, useState }from 'react';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
-
+import React from 'react';
 import { 
   BrowserRouter as Router,
   Routes,

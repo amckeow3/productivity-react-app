@@ -20,6 +20,8 @@ const closeButton = {
     width: '40px'
 };
 
+const main = '#e040fb';
+
 const todoSchema = object({
     uid: string(),
     todoName: string().min(1, 'A name is required').max(70),
